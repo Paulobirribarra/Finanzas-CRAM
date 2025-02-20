@@ -19,7 +19,7 @@ mongoose.connect('mongodb://localhost:27017/facturas')
 const routeApi = require('./routes/api');
 
 //Usar Rutas Importadas
-app.use('./api', routeApi);
+app.use('/api', routeApi);
 
 //Iniciar Servidor
 app.listen(port, () => {
