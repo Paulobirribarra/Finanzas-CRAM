@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 require('dotenv').config({ path: '.local.env' });
+const auth = require('../middlewares/auth');
+const Facturas = require('../models/Facturas');
 
 const API_URL = process.env.API_URL;
 const API_KEY = process.env.password_Api;
@@ -10,7 +12,22 @@ const USERNAME = "api";
 const RUT_USUARIO = String(process.env.RUT_USUARIO);
 const PASSWORD_SII = String(process.env.PASSWORD_SII);
 const RUT_EMPRESA = String(process.env.RUT_EMPRESA);
-const AMBIENTE = Number(process.env.AMBIENTE); // Convertimos solo este a número
+const AMBIENTE = Number(process.env.AMBIENTE);
+
+router.get('/facturas', auth(['admin', 'lector']), async (req, res) => {
+    const facturas = await Facturas.find();
+    res.json(facturas);
+});
+
+router.post('/facturas/consultar', auth(['admin']), async (req, res) => {
+    // Lógica para consultar facturas desde el SII
+});
+
+router.put('/facturas/:id', auth(['admin']), async (req, res) => {
+    const { pagada, comentario } = req.body;
+    await Facturas.findByIdAndUpdate(req.params.id, { pagada, comentario });
+    res.json({ mensaje: 'Factura actualizada' });
+});
 
 router.get('/consulta', async (req, res) => {
     try {
@@ -19,7 +36,7 @@ router.get('/consulta', async (req, res) => {
 
         const url = `${API_URL}/api/RCV/ventas/${mes}/${anio}`;
         const body = {
-            RutUsuario: RUT_USUARIO, 
+            RutUsuario: RUT_USUARIO,
             PasswordSII: PASSWORD_SII,
             RutEmpresa: RUT_EMPRESA,
             Ambiente: AMBIENTE
@@ -53,11 +70,11 @@ router.get('/consulta', async (req, res) => {
     }
 });
 
-console.log("🔍 Credenciales del SII:");
-console.log("RutUsuario:", `"${RUT_USUARIO}"`);
-console.log("PasswordSII:", `"${PASSWORD_SII}"`);
-console.log("RutEmpresa:", `"${RUT_EMPRESA}"`);
-console.log("Ambiente:", AMBIENTE);
+// console.log("🔍 Credenciales del SII:");
+// console.log("RutUsuario:", `"${RUT_USUARIO}"`);
+// console.log("PasswordSII:", `"${PASSWORD_SII}"`);
+// console.log("RutEmpresa:", `"${RUT_EMPRESA}"`);
+// console.log("Ambiente:", AMBIENTE);
 
 
 module.exports = router;

@@ -9,6 +9,9 @@ require('dotenv').config({ path: '.local.env' });
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Middleware para parsear JSON
+app.use(express.json());
+
 //Conectar a MongoDB
 mongoose.connect('mongodb://localhost:27017/facturas')
     .then(() => console.log('Conectado a MongoDB'))
@@ -17,13 +20,15 @@ mongoose.connect('mongodb://localhost:27017/facturas')
 
 //Importar Rutas
 const routeApi = require('./routes/api');
+const authRoutes = require('./routes/auth');
 
 //Usar Rutas Importadas
 app.use('/api', routeApi);
+app.use('/auth', authRoutes);
 
 //Iniciar Servidor
 app.listen(port, () => {
-    console.log(`Servidor corriendo en el puerto`, process.env.PORT);
+    console.log(`Servidor corriendo en el puerto http://localhost:${process.env.PORT}`)
 })
 
 //Ruta Principal
